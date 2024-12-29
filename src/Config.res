@@ -1,7 +1,6 @@
 /**
  * Configuration constants and defaults for the BTC price query library
  */
-
 open Types
 
 let defaultConfig: config = {

@@ -1,7 +1,6 @@
 /**
  * Core type definitions for the BTC price query library
  */
-
 /** Represents price data from the exchange */
 type priceData = {
   price: float,
@@ -10,7 +9,7 @@ type priceData = {
 }
 
 /** Possible error states during price fetching */
-type error = 
+type error =
   | NetworkError(string)
   | InvalidResponse(string)
   | RateLimitExceeded
