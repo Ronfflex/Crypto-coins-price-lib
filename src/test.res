@@ -19,3 +19,6 @@ PriceLib.getPrice(
     })
   },
 )
+// Test avec l'API CoinMarketCap
+let clientCMC = PriceLib.createClientUrl("https://pro-api.coinmarketcap.com")
+PriceLib.getCMCPrice(clientCMC, "BTC", "USD")
