@@ -4,7 +4,7 @@
 open Types
 
 let defaultConfig: config = {
-  baseUrl: "https://api.exchange.com",
+  baseUrl: "https://api.coingecko.com/api/v3",
   timeout: 5000,
   retryAttempts: 3,
 }
@@ -20,3 +20,8 @@ let rateLimit = 60
 /** Cache configuration */
 let maxCacheSize = 1000 // Maximum number of cached items
 let defaultCacheTtl = 30 // Default TTL in seconds
+
+// Ajout des accès directs
+let baseUrl = defaultConfig.baseUrl
+let defaultTimeout = defaultConfig.timeout
+let defaultRetryAttempts = defaultConfig.retryAttempts

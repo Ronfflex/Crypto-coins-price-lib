@@ -6,9 +6,10 @@ type lruCacheOptions = {
   ttl: int,
 }
 
-@module("lru-cache")
-external createLRUCache: lruCacheOptions => 'cache = "default"
+/** Importation de l'export nommé depuis `lru-cache` */
+@module("lru-cache") @new external createLRUCache: lruCacheOptions => 'cache = "LRUCache";
 
+/** Module Cache */
 module Cache = {
   type t<'cache, 'value> = {cache: 'cache}
 
@@ -17,28 +18,26 @@ module Cache = {
       max,
       ttl: ttl * 1000, // Convert to milliseconds
     }
-    {
-      cache: createLRUCache(options),
-    }
+    {cache: createLRUCache(options)}
   }
 
-  @send external set: ('cache, string, 'value) => unit = "set"
-  @send external get: ('cache, string) => Nullable.t<'value> = "get"
-  @send external clear: 'cache => unit = "clear"
+  @send external set: ('cache, string, 'value) => unit = "set";
+  @send external get: ('cache, string) => Nullable.t<'value> = "get";
+  @send external clear: 'cache => unit = "clear";
 
   let set = (cache: t<'cache, 'value>, key: string, value: 'value): unit => {
-    cache.cache->set(key, value)
+    set(cache.cache, key, value)
   }
 
   let get = (cache: t<'cache, 'value>, key: string): option<'value> => {
-    cache.cache->get(key)->Nullable.toOption
+    get(cache.cache, key)
+    |> Js.Nullable.toOption
   }
 
   let clear = (cache: t<'cache, 'value>): unit => {
-    cache.cache->clear
+    clear(cache.cache)
   }
 }
-
 /**
  * Validates a price value
  */

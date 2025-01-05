@@ -8,6 +8,12 @@ type priceData = {
   symbol: string,
 }
 
+type client = {
+  baseUrl: string,
+  timeout: int,
+  retryAttempts: int,
+}
+
 /** Possible error states during price fetching */
 type error =
   | NetworkError(string)
