@@ -15,6 +15,6 @@
     "@rescript/core": "1.6.1",
     "lru-cache": "^11.0.2",
     "rescript": "11.1.4",
-    "rescript-webapi": "0.10.0"
+    "rescript-webapi": "^0.10.0"
   }
 }
