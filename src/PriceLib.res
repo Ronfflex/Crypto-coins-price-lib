@@ -67,6 +67,10 @@ module PriceLib = {
     ->ignore
   }
 
+  let formatData = (price, symbol, ccy) => {
+    Belt.Option.forEach(Some(price), x => Js.log4(symbol, "price: ", x, ccy))
+  }
+
   let getCMCPrice = (
     client: Api.client,
     cryptoSymbol: string,
@@ -110,7 +114,7 @@ module PriceLib = {
     Js.Dict.get(ccyObj, "price")
   )
   ->Belt.Option.map(price => {
-    Js.log(price)
+    formatData(price, cryptoSymbol, currency)
   })
   ->Belt.Option.getWithDefault(())
   Promise.resolve(())
