@@ -71,6 +71,7 @@ module PriceLib = {
     client: Api.client,
     cryptoSymbol: string,
     currency: string,
+    api_key: string
   ) => {
  
   let endpoint = client.baseUrl ++ "/v1/cryptocurrency/quotes/latest?convert=" ++ currency ++ "&symbol=" ++ cryptoSymbol
@@ -81,7 +82,7 @@ module PriceLib = {
     ~method_=Get,
     ~headers=Fetch.HeadersInit.make({
       "Accepts": "application/json",
-      "X-CMC_PRO_API_KEY": "8958b1e7-36e6-4335-9ff7-86f9da097128",
+      "X-CMC_PRO_API_KEY": api_key,
     }),
     (),
   ),

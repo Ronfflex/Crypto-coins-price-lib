@@ -59,11 +59,11 @@ function getPrice(client, cryptoId, vsCurrency, onSuccess, onError) {
         }));
 }
 
-function getCMCPrice(client, cryptoSymbol, currency) {
+function getCMCPrice(client, cryptoSymbol, currency, api_key) {
   var endpoint = client.baseUrl + "/v1/cryptocurrency/quotes/latest?convert=" + currency + "&symbol=" + cryptoSymbol;
   Core__Promise.$$catch(fetch(endpoint, Webapi__Fetch.RequestInit.make("Get", {
                     Accepts: "application/json",
-                    "X-CMC_PRO_API_KEY": "8958b1e7-36e6-4335-9ff7-86f9da097128"
+                    "X-CMC_PRO_API_KEY": api_key
                   }, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined)).then(function (prim) {
               return prim.json();
             }).then(function (json) {
