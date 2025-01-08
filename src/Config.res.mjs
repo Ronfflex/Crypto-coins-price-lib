@@ -2,7 +2,7 @@
 
 
 var defaultConfig = {
-  baseUrl: "https://api.exchange.com",
+  baseUrl: "https://api.coingecko.com/api/v3",
   timeout: 5000,
   retryAttempts: 3
 };
@@ -18,11 +18,20 @@ var maxCacheSize = 1000;
 
 var defaultCacheTtl = 30;
 
+var baseUrl = "https://api.coingecko.com/api/v3";
+
+var defaultTimeout = 5000;
+
+var defaultRetryAttempts = 3;
+
 export {
   defaultConfig ,
   defaultQueryOptions ,
   rateLimit ,
   maxCacheSize ,
   defaultCacheTtl ,
+  baseUrl ,
+  defaultTimeout ,
+  defaultRetryAttempts ,
 }
 /* No side effect */
