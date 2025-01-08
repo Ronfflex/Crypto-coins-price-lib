@@ -1,8 +1,9 @@
 open Webapi
 
 
+
 module PriceLib = {
-  let createClient = (~baseUrl=Config.baseUrl, ~timeout=Config.defaultTimeout, ~retryAttempts=Config.defaultRetryAttempts, ()): Api.client => {
+  let createClient = (~baseUrl=Config.baseUrl, ~timeout=Config.defaultTimeout, ~retryAttempts=Config.defaultRetryAttempts, ()): Types.client => {
     {
       baseUrl,
       timeout,
@@ -12,59 +13,75 @@ module PriceLib = {
 
   let createClientUrl = (baseUrl) => {
     createClient(
-    ~baseUrl=baseUrl,
-    ~timeout=Config.defaultTimeout,
-    ~retryAttempts=Config.defaultRetryAttempts,
-    ())
-  } 
-  
-
+      ~baseUrl=baseUrl,
+      ~timeout=Config.defaultTimeout,
+      ~retryAttempts=Config.defaultRetryAttempts,
+      ()
+    )
+  }
 
   let getPrice = (
-    client: Api.client,
+    client: Types.client,
     cryptoId: string,
     vsCurrency: string,
     onSuccess: Types.priceData => unit,
     onError: string => unit,
-  ) => {
+  ): promise<unit> => {
     let endpoint = `${client.baseUrl}/simple/price?ids=${cryptoId}&vs_currencies=${vsCurrency}`
 
     Fetch.fetch(endpoint)
     ->Promise.then(Fetch.Response.text)
     ->Promise.then(text => {
       switch Js.Json.parseExn(text)->Js.Json.decodeObject {
-      | Some(json) =>
-        switch Js.Dict.get(json, cryptoId) {
-        | Some(dataJson) =>
-          switch Js.Json.decodeObject(dataJson) {
-          | Some(dataDict) =>
-            switch Js.Dict.get(dataDict, vsCurrency) {
-            | Some(priceJson) =>
-              switch Js.Json.decodeNumber(priceJson) {
-              | Some(price) =>
-                Promise.resolve(
-                  onSuccess({
-                    price: price,
-                    timestamp: Js.Date.now(),
-                    symbol: `${cryptoId}/${vsCurrency}`,
-                  }),
-                )
-              | None => Promise.resolve(onError("Invalid price format"))
-              }
-            | None => Promise.resolve(onError("Currency not found in response"))
-            }
-          | None => Promise.resolve(onError("Invalid crypto data format"))
-          }
-        | None => Promise.resolve(onError("Crypto ID not found in response"))
+      | Some(jsonDict) =>
+        let maybePrice =
+          Belt.Option.flatMap(Js.Dict.get(jsonDict, cryptoId), dataJson =>
+            Belt.Option.flatMap(Js.Json.decodeObject(dataJson), dataDict =>
+              Belt.Option.flatMap(Js.Dict.get(dataDict, vsCurrency), priceJson =>
+                Js.Json.decodeNumber(priceJson)
+              )
+            )
+          )
+
+        switch maybePrice {
+        | Some(price) =>
+          onSuccess({
+            price: price,
+            timestamp: Js.Date.now(),
+            symbol: `${cryptoId}/${vsCurrency}`,
+          })
+        | None =>
+          onError("Failed to parse the price")
         }
-      | None => Promise.resolve(onError("Invalid JSON response"))
+
+        Promise.resolve()
+      | None =>
+        onError("Invalid JSON response")
+        Promise.resolve()
       }
     })
     ->Promise.catch(_ => {
       onError("Failed to fetch data")
       Promise.resolve()
     })
-    ->ignore
+  }
+
+  let getPriceWithPromise = (
+    client: Types.client,
+    cryptoId: string,
+    vsCurrency: string,
+  ): promise<Types.result> => {
+    Promise.make((resolve, _) => {
+      getPrice(
+        client,
+        cryptoId,
+        vsCurrency,
+        (data) => resolve(Belt.Result.Ok(data)),
+        (error) =>
+          resolve(Belt.Result.Error(Types.UnexpectedError(error))), // Conversion de l'erreur string
+      )
+      ->ignore
+    })
   }
 
   let formatData = (price, symbol, ccy) => {
@@ -72,7 +89,7 @@ module PriceLib = {
   }
 
   let getCMCPrice = (
-    client: Api.client,
+    client: Types.client,
     cryptoSymbol: string,
     currency: string,
     api_key: string
@@ -124,6 +141,5 @@ module PriceLib = {
   Promise.resolve(())
 })
 ->ignore
-
-}
+  }
 }
